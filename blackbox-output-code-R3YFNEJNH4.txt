@@ -1,0 +1,214 @@
+import { useState, useRef } from 'react';
+
+const TumbleriaMusicGenerator = () => {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedAudio, setGeneratedAudio] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedImage(file);
+      setError(null);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setError('Please select a valid image file');
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const file = event.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedImage(file);
+      setError(null);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setError('Please drop a valid image file');
+    }
+  };
+
+  const generateMusicFromImage = async () => {
+    if (!selectedImage) {
+      setError('Please select an image first');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      setTimeout(() => {
+        const demoAudioUrl = 'https://example.com/demo-audio.mp3';
+        setGeneratedAudio(demoAudioUrl);
+        setIsGenerating(false);
+      }, 3000);
+      
+    } catch (err) {
+      setError('Failed to generate music. Please try again.');
+      setIsGenerating(false);
+      console.error('Music generation error:', err);
+    }
+  };
+
+  const resetSelection = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    setGeneratedAudio(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-pink-300 py-8 px-4" style={{ fontFamily: 'Times New Roman, serif' }}>
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-pink-700 mb-4">Tumbleria</h1>
+          <p className="text-lg text-pink-800 max-w-2xl mx-auto">
+            Transform your special moments into beautiful music. Upload a scene from your graduation, 
+            Valentine's Day, or any celebration, and we'll create a unique musical composition inspired by your image.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="bg-pink-50/90 backdrop-blur-sm border-pink-200 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-pink-700 mb-4">Create Your Music</h2>
+            <div 
+              className="border-2 border-dashed border-pink-300 rounded-lg p-8 text-center cursor-pointer hover:bg-pink-100 transition-colors"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="mx-auto w-16 h-16 mb-4">
+                <img 
+                  src="https://placeholder-image-service.onrender.com/image/64x64?prompt=upload%20icon%20with%20arrow%20pointing%20upward%20and%20cloud%20symbol" 
+                  alt="Upload icon with upward arrow and cloud symbol" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <p className="text-pink-700 font-medium mb-2">
+                Drag & drop your image here
+              </p>
+              <p className="text-pink-600 text-sm">
+                or click to browse files
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+
+            {error && (
+              <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded-md">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
+
+            {imagePreview && (
+              <div className="mt-6">
+                <div className="relative">
+                  <img 
+                    src={imagePreview} 
+                    alt="Uploaded celebration scene showing people and decorations for music inspiration" 
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={resetSelection}
+                    className="absolute top-2 right-2 bg-pink-500 text-white p-1 rounded-full hover:bg-pink-600"
+                  >
+                    <img 
+                      src="https://placeholder-image-service.onrender.com/image/16x16?prompt=red%20x%20close%20icon%20on%20pink%20background" 
+                      alt="Red X close button to remove selected celebration image" 
+                      className="w-4 h-4"
+                    />
+                  </button>
+                </div>
+                <button
+                  onClick={generateMusicFromImage}
+                  disabled={isGenerating}
+                  className="w-full mt-4 bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg"
+                >
+                  {isGenerating ? 'Generating Music...' : 'Generate Music from Image'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-pink-50/90 backdrop-blur-sm border-pink-200 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-pink-700 mb-4">Your Generated Music</h2>
+            {isGenerating ? (
+              <div className="text-center py-12">
+                <div className="mx-auto w-16 h-16 mb-4">
+                  <img 
+                    src="https://placeholder-image-service.onrender.com/image/64x64?prompt=pink%20music%20notes%20floating%20with%20sparkles%20and%20glitter%20animation" 
+                    alt="Pink music notes floating with sparkling glitter animation indicating music generation in progress" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <p className="text-pink-700">Creating your unique composition...</p>
+              </div>
+            ) : generatedAudio ? (
+              <div>
+                <div className="bg-pink-100 p-4 rounded-lg mb-4 border border-pink-200">
+                  <audio controls className="w-full">
+                    <source src={generatedAudio} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+                <div className="flex gap-2">
+                  <button className="bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg">
+                    Download Music
+                  </button>
+                  <button className="border border-pink-300 text-pink-700 font-medium py-2 px-4 rounded-lg" onClick={resetSelection}>
+                    Try Another Image
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-pink-600">
+                <div className="mx-auto w-16 h-16 mb-4">
+                  <img 
+                    src="https://placeholder-image-service.onrender.com/image/64x64?prompt=pink%20musical%20notes%20floating%20above%20a%20elegant%20glass%20tumbler%20with%20flowers" 
+                    alt="Pink musical notes floating above an elegant glass tumbler filled with flowers waiting for image upload" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <p className="text-pink-700">Upload an image to generate your custom music</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="text-center text-pink-700 border-t border-pink-200 pt-8">
+          <p>© 2025 Tumbleria. Turning moments into memories with flowers and music.</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TumbleriaMusicGenerator;

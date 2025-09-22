@@ -1,0 +1,22 @@
+<<<<<<< SEARCH
+=======
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tumbleria - AI Music Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body { 
+        font-family: 'Times New Roman', serif; 
+        background: linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen py-8 px-4">
+    <div id="root"></div>
+    <script type="module" src="/src/App.tsx"></script>
+  </body>
+</html>
+>>>>>>> REPLACE
